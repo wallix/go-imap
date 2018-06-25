@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	customimapprocessor "github.com/wallix/datapeps-mail/CustomImapProcessor"
 )
 
 // Message flags, defined in RFC 3501 section 2.3.2.
@@ -245,32 +247,7 @@ func (m *Message) Parse(fields []interface{}) error {
 					// Not a section name, maybe an attribute defined in an IMAP extension
 					m.Items[k] = f
 				} else {
-					//TODO : verify that f is always a bytes.buffer
-					var indexBody int
-					if k == "BODY[]" {
-						switch v := f.(type) {
-						case *bytes.Buffer:
-							//indexBody holds the beginning of the body
-							indexBody = strings.Index(v.String(), "\n\r") + 2
-							if indexBody < 0 {
-								return fmt.Errorf("Could not find the header")
-							}
-							v.WriteString("Passed through my proxy ")
-
-						default:
-							return fmt.Errorf("Could not find the body unknown type :  %T", f)
-						}
-
-					} else if k == "BODY[text]" {
-						switch v := f.(type) {
-						case *bytes.Buffer:
-							//indexBody holds the beginning of the body
-							log.Println(indexBody)
-							v.WriteString("Passed through my proxy ")
-
-						default:
-							return fmt.Errorf("Could not find the body unknown type :  %T", f)
-						}
+					customimapprocessor.processBody(&f,k)
 					}
 					m.Body[section], _ = f.(Literal)
 
