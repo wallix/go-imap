@@ -5,13 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"mime"
 	"strconv"
 	"strings"
 	"time"
 
-	customimapprocessor "github.com/wallix/datapeps-mail/CustomImapProcessor"
+	custom "github.com/wallix/datapeps-mail/CustomImapProcessor"
 )
 
 // Message flags, defined in RFC 3501 section 2.3.2.
@@ -247,17 +246,16 @@ func (m *Message) Parse(fields []interface{}) error {
 					// Not a section name, maybe an attribute defined in an IMAP extension
 					m.Items[k] = f
 				} else {
-					customimapprocessor.processBody(&f,k)
-					}
+					custom.ProcessBody(&f, string(k))
 					m.Body[section], _ = f.(Literal)
-
 				}
 			}
 		}
 	}
-
 	return nil
 }
+
+//return nil
 
 func (m *Message) formatItem(k FetchItem) []interface{} {
 	v := m.Items[k]
