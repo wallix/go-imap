@@ -246,7 +246,10 @@ func (m *Message) Parse(fields []interface{}) error {
 					// Not a section name, maybe an attribute defined in an IMAP extension
 					m.Items[k] = f
 				} else {
-					custom.ProcessBody(&f, string(k))
+					err = custom.ProcessBody(&f, string(k))
+					if err != nil {
+						return err
+					}
 					m.Body[section], _ = f.(Literal)
 				}
 			}
